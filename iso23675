@@ -1,0 +1,37 @@
+
+def calculate_absorbance(transmittance_percent):
+    """Convert transmittance (%) to absorbance"""
+    transmittance_fraction = np.clip(transmittance_percent / 100.0, 1e-6, 1)
+    return -np.log10(transmittance_fraction)
+
+def load_reference_data():
+    """Load standard solar irradiance and erythemal effectiveness (mock data)"""
+    wavelengths = np.arange(290, 401)
+    E_lambda = np.exp(-0.035 * (wavelengths - 290))  # Mock erythemal weighting
+    S_lambda = np.ones_like(wavelengths)             # Flat solar spectrum for simplicity
+    return pd.DataFrame({'Wavelength': wavelengths, 'E': E_lambda, 'S': S_lambda})
+
+def calculate_spf(data_df):
+    """
+    Estimate SPF using ISO 23675 approach
+    Args:
+        data_df (pd.DataFrame): DataFrame with 'Wavelength' and 'Transmittance (%)'
+    Returns:
+        float: Estimated SPF
+    """
+    ref_df = load_reference_data()
+    merged = pd.merge(data_df, ref_df, on='Wavelength', how='inner')
+    merged['A'] = calculate_absorbance(merged['Transmittance (%)'])
+
+    numerator = (merged['E'] * merged['S']).sum()
+    denominator = (merged['E'] * merged['S'] * 10 ** (-merged['A'])).sum()
+
+    spf = numerator / denominator if denominator > 0 else 0
+    return round(spf, 2)
+
+# Example usage
+if __name__ == "__main__":
+    df = pd.read_csv("data/sample_data.csv")
+    result = calculate_spf(df)
+    print(f"Estimated SPF (ISO 23675): {result}")
+
