@@ -19,7 +19,7 @@ Where:
 
 ---
 
-## 📄 Example Input File (`sample_data.csv`)
+#Example Input File (`sample_data.csv`)
 
 ```csv
 Wavelength,Transmittance (%)
