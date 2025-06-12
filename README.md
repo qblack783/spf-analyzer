@@ -28,7 +28,6 @@ Wavelength,Transmittance (%)
 ...
 400,30.5
 pip install pandas numpy
-pip install pandas numpy
 Estimated SPF (ISO 23675): 17.34
 
 
